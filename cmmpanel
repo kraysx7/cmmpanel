@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# Скрипт для запуска и остановки erlang приложений
+# 
+
+APP_NAME=cmmpanel
+APP_ROOT=/srv/cmmpanel/ebin
+COOKIE="FOOBAR"
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start)
+	echo -n "Starting erlang app: "$APP_NAME
+	
+	cd $APP_ROOT
+	erl -name $APP_NAME -pa $APP_ROOT -eval "application:start($APP_NAME)" \
+		-kernel inet_dist_listen_min 9001 inet_dist_listen_max 9005 -setcookie $COOKIE -connect_all false -noshell
+	
+	echo "."
+	;;
+  stop)
+    echo -n "Stopping erlang app: "$APP_NAME
+	
+	erl -noshell -name temp_control \
+		-eval "rpc:call($APP_NAME, 'init', 'stop', [])" \
+		-s init stop
+	
+	echo "."
+	;;
+  restart)
+	echo -n "Restarting erlang app: "$APP_NAME
+	echo "."
+	;;
+
+  *)
+	echo "Usage: "$1" {start|stop|restart}"
+	exit 1
+esac
+
+exit 0

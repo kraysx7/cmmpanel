@@ -1,0 +1,14 @@
+#!/usr/bin/env escript
+%%! -name cmmpanel@192.168.0.66 -setcookie FOOBAR
+
+
+main(String) ->
+    io:format("Param >~p<~n", [String]),
+	Node = 'cmmcontroller@192.168.0.66',
+	Mod = 'rpc_i2c_handler',
+	Fun = 'get_i2c_info',
+	Args = [5],
+	R = rpc:call(Node, Mod, Fun, Args),
+	io:format("------ ~p -------~n",[R]).
+
+
